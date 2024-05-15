@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,8 +59,15 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void deleteAuthor(int id) {
-        Author author = authorRepo.findById(id).get();
-        author.setActive(false);
-        authorRepo.save(author);
+        Optional<Author> author = authorRepo.findById(id);
+        if (author.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid Author Id");
+        }
+        if (author.get().getActive()) {
+            author.get().setActive(false);
+        } else {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Author already deleted with id " + id);
+        }
+        authorRepo.save(author.get());
     }
 }

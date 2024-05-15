@@ -35,6 +35,6 @@ public class MemberController {
     @DeleteMapping("/{id}")
     public CustomResponse<MemberDto> deleteMember(@PathVariable Integer id){
         service.deleteMember(id);
-        return CustomResponse.success();
+        return CustomResponse.success("Member deleted with Id "+id);
     }
 }

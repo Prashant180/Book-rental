@@ -18,6 +18,12 @@ public class CustomResponse<T> {
                 .success(true)
                 .build();
     }
+    public static <T> CustomResponse<T> success(String message){
+        return  CustomResponse.<T>builder()
+                .message(message)
+                .success(true)
+                .build();
+    }
 
     public static <T> CustomResponse<T> success(T data){
         return CustomResponse.<T>builder()

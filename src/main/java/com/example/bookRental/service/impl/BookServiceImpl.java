@@ -65,13 +65,13 @@ public class BookServiceImpl implements BookService {
         if (!bookRequest.getBookName().matches("^[a-zA-Z\s]+$")) {
             throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "Invalid name format!");
         }
-        if (bookRequest.getStock()<=0){
-            throw new CustomException(HttpStatus.BAD_REQUEST,"Stock cannot be negative!");
+        if (bookRequest.getStock() <= 0) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Stock cannot be negative!");
         }
-        if (bookRequest.getNoOfPages()<1){
-            throw new CustomException(HttpStatus.BAD_REQUEST,"Book must have pages!");
+        if (bookRequest.getNoOfPages() < 1) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Book must have pages!");
         }
-        if(bookRequest.getRating()<0 || bookRequest.getRating()>10){
+        if (bookRequest.getRating() < 0 || bookRequest.getRating() > 10) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "Rating must be between 0-10!");
         }
 
@@ -98,8 +98,15 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteBook(Integer id) {
-        Book book = bookRepo.findById(id).get();
-        book.setActive(false);
-        bookRepo.save(book);
+        Optional<Book> book = bookRepo.findById(id);
+        if (book.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid Book Id");
+        }
+        if (book.get().getActive()) {
+            book.get().setActive(false);
+        } else {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Book already deleted with id " + id);
+        }
+        bookRepo.save(book.get());
     }
 }

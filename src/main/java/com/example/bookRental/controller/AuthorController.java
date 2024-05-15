@@ -36,7 +36,7 @@ public class AuthorController {
     @DeleteMapping("/{id}")
     public CustomResponse<AuthorDto> deleteAuthor(@PathVariable Integer id){
         service.deleteAuthor(id);
-        return CustomResponse.success();
+        return CustomResponse.success("Author deleted with Id "+id);
     }
 
 }

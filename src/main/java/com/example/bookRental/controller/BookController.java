@@ -38,6 +38,6 @@ public class BookController {
     @DeleteMapping("/{id}")
     public CustomResponse<BookDto> deleteBook(@PathVariable Integer id) {
         service.deleteBook(id);
-        return CustomResponse.success();
+        return CustomResponse.success("Book deleted with Id "+id);
     }
 }

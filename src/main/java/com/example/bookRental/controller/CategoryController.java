@@ -36,7 +36,7 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public CustomResponse<CategoryDto> deleteCategory(@PathVariable Integer id){
         service.deleteCategory(id);
-        return CustomResponse.success();
+        return CustomResponse.success("Category deleted with Id "+id);
     }
 
 }
