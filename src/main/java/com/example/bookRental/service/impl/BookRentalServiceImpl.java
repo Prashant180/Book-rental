@@ -68,7 +68,7 @@ public class BookRentalServiceImpl implements BookRentalService {
         }
         return code;
     }
-
+//code to add new book with validations
     @Override
     public BookRentalDto rentBook(BookRentRequest bookRentRequest) {
 
