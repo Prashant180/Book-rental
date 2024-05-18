@@ -67,12 +67,12 @@ public class BookRentalServiceImpl implements BookRentalService {
     }
 
     @Override
-    public BookRentalDto getRentedBookByCode(int code) {
-        BookRental bookRental=bookRentalRepo.findByTransactionCode(code);
+    public BookRentalProjection getRentedBookByCode(int code) {
+        BookRentalProjection bookRental=bookRentalRepo.findBookRentalByCodeWithName(code);
         if (bookRental == null){
             throw new CustomException(HttpStatus.BAD_REQUEST,"Invalid Transaction Code!");
         }
-        return BookRentalMapper.mapToBookRentalDto(bookRental);
+        return bookRental;
     }
 
     public static int random(Integer length) {
@@ -103,7 +103,7 @@ public class BookRentalServiceImpl implements BookRentalService {
         BookRental bookRented = getRentalByMemberID(bookRentRequest.getMemberId());
         BookRental bookRental = new BookRental();
 
-        if (bookRented != null && (Objects.equals(bookRented.getStatus(), "closed"))) {
+        if (bookRented != null && !(Objects.equals(bookRented.getStatus(), "closed"))) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "Cannot issue new book until previous book is returned");
         }
         LocalDate currentDate = LocalDate.now();

@@ -23,4 +23,13 @@ public interface BookRentalRepo extends JpaRepository<BookRental, Integer> {
     , nativeQuery = true)
     List<BookRentalProjection> findBookRentalWithName();
 
+    @Query(value ="SELECT br.id, br.from_date, br.status, br.to_date, br.transaction_code, br.book_id, br.member_id, b.book_name, m.member_name" +
+            " FROM book_rental br" +
+            " INNER JOIN book b" +
+            " on br.book_id=b.id" +
+            " INNER JOIN member m" +
+            " on br.member_id=m.id" +
+            " WHERE br.transaction_code=?"
+    , nativeQuery = true)
+    BookRentalProjection findBookRentalByCodeWithName(Integer code);
 }

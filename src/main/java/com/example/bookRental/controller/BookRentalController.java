@@ -37,7 +37,7 @@ public class BookRentalController {
     }
 
     @GetMapping("/by-code/{code}")
-    public CustomResponse<BookRentalDto> getRentedBookByCode(@PathVariable Integer code) {
+    public CustomResponse<BookRentalProjection> getRentedBookByCode(@PathVariable Integer code) {
         return CustomResponse.success(service.getRentedBookByCode(code));
     }
 

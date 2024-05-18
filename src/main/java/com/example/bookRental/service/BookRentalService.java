@@ -17,7 +17,7 @@ public interface BookRentalService {
 
     BookRental getRentalByMemberID(int id);
 
-    BookRentalDto getRentedBookByCode(int code);
+    BookRentalProjection getRentedBookByCode(int code);
 
     BookRentalDto rentBook(BookRentRequest bookRentRequest);
 
