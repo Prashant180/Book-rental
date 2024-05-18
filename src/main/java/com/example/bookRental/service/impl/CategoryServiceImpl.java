@@ -31,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryDto.getName().matches("^[a-zA-Z\s]+$")) {
             throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "Invalid name format!");
         }
-        Category category = categoryRepo.findByName(categoryDto.getName());
+        Category category = categoryRepo.findByName(categoryDto.getName().trim());
         if (category != null) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "Category with this name already exist!");
         }

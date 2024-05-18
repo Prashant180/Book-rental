@@ -28,12 +28,12 @@ public class CategoryController {
         return  CustomResponse.success(service.addCategory(categoryDto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get-by-id/{id}")
     public CustomResponse<CategoryDto> getCategory(@PathVariable Integer id){
         return CustomResponse.success(service.getCategoryById(id));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public CustomResponse<CategoryDto> deleteCategory(@PathVariable Integer id){
         service.deleteCategory(id);
         return CustomResponse.success("Category deleted with Id "+id);

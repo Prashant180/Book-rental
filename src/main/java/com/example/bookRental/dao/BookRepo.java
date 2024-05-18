@@ -10,4 +10,5 @@ import java.util.List;
 public interface BookRepo extends JpaRepository<Book, Integer> {
     List<Book> findByActiveTrue();
     Book findByIdAndActiveTrue(int id);
+    Book findByBookName(String  name);
 }

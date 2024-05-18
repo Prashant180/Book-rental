@@ -49,24 +49,36 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto addBook(BookRequest bookRequest) {
-
-
         LocalDate currentDate = LocalDate.now();
+
+        Book book = bookRepo.findByBookName(bookRequest.getBookName().trim());
+        if (book != null ){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Book name already exists!");
+        }
 
         Book book1 = new Book();
         List<Author> authors = new ArrayList<>();
-        Category category = new Category();
 
         if (bookRequest.getCategoryId() != null) {
-            category = categoryRepo.findById(bookRequest.getCategoryId()).get();
-            book1.setCategory(category);
+            Optional<Category> category = categoryRepo.findById(bookRequest.getCategoryId());
+            if (category.isEmpty()) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid category Id!");
+            } else {
+                book1.setCategory(category.get());
+            }
+        } else {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Category cannot be empty!");
         }
 
-        if (!bookRequest.getBookName().matches("^[a-zA-Z\s]+$")) {
+        if (bookRequest.getAuthorsId().isEmpty()){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Author Id Cannot be empty!");
+        }
+
+        if (!bookRequest.getBookName().trim().matches("^[a-zA-Z\s]+$")) {
             throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "Invalid name format!");
         }
-        if (bookRequest.getStock() <= 0) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "Stock cannot be negative!");
+        if (bookRequest.getStock() < 1 ) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Stock cannot be less than 1!");
         }
         if (bookRequest.getNoOfPages() < 1) {
             throw new CustomException(HttpStatus.BAD_REQUEST, "Book must have pages!");
@@ -88,11 +100,31 @@ public class BookServiceImpl implements BookService {
         }
         book1.setPhoto(bookRequest.getPhoto());
         for (int authorId : bookRequest.getAuthorsId()) {
-            Author author = authorRepo.findById(authorId).get();
-            authors.add(author);
+            Optional<Author> author = authorRepo.findById(authorId);
+            if (author.isEmpty()){
+                throw new CustomException(HttpStatus.BAD_REQUEST,"Invalid author id!");
+            }
+            authors.add(author.get());
         }
         book1.setAuthors(authors);
         Book savedBook = bookRepo.save(book1);
+        return BookMapper.mapToBookDto(savedBook);
+    }
+
+    public BookDto updateBook(BookDto bookDto){
+        Optional<Book> book=bookRepo.findById(bookDto.getId());
+        if(book.isEmpty()){
+            throw new CustomException(HttpStatus.BAD_REQUEST,"Book not found to update!");
+        }
+        if (bookDto.getStock() < 1) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Stock cannot be less than 1!");
+        }
+        if (bookDto.getRating() < 0 || bookDto.getRating() > 10) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Rating must be between 0-10!");
+        }
+        book.get().setStock(bookDto.getStock());
+        book.get().setRating(bookDto.getRating());
+        Book savedBook=bookRepo.save(book.get());
         return BookMapper.mapToBookDto(savedBook);
     }
 

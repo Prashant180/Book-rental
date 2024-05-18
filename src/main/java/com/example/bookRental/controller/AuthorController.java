@@ -27,13 +27,17 @@ public class AuthorController {
     public CustomResponse<AuthorDto> addAuthor(@RequestBody AuthorDto authorDto){
         return CustomResponse.success(service.addAuthor(authorDto));
     }
+    @PutMapping("/update")
+    public CustomResponse<AuthorDto> updateAuthor(@RequestBody AuthorDto authorDto){
+        return CustomResponse.success(service.updateAuthor(authorDto));
+    }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get-by-id/{id}")
     public CustomResponse<AuthorDto> getAuthor(@PathVariable Integer id){
         return CustomResponse.success(service.getAuthorById(id));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public CustomResponse<AuthorDto> deleteAuthor(@PathVariable Integer id){
         service.deleteAuthor(id);
         return CustomResponse.success("Author deleted with Id "+id);

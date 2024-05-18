@@ -17,7 +17,7 @@ public class AuthorMapper {
 
     public static Author mapToAuthor(AuthorDto authorDto){
         Author author=new Author(
-//                authorDto.getId(),
+                authorDto.getId(),
                 authorDto.getAuthorName(),
                 authorDto.getEmail(),
                 authorDto.getMobileNumber()
