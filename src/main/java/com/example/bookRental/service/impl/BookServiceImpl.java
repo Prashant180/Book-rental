@@ -4,13 +4,16 @@ import com.example.bookRental.CustomException;
 import com.example.bookRental.dao.AuthorRepo;
 import com.example.bookRental.dao.BookRepo;
 import com.example.bookRental.dao.CategoryRepo;
+import com.example.bookRental.dao.ImageDataRepo;
 import com.example.bookRental.dto.BookDto;
 import com.example.bookRental.dto.BookRequest;
 import com.example.bookRental.mapper.BookMapper;
 import com.example.bookRental.model.Author;
 import com.example.bookRental.model.Book;
 import com.example.bookRental.model.Category;
+import com.example.bookRental.model.ImageData;
 import com.example.bookRental.service.BookService;
+import com.example.bookRental.service.ImageDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,9 @@ public class BookServiceImpl implements BookService {
     @Autowired
     private CategoryRepo categoryRepo;
 
+    @Autowired
+    private ImageDataService imageDataService;
+
     @Override
     public List<BookDto> getAllBooks() {
         List<Book> books = bookRepo.findByActiveTrue();
@@ -43,7 +49,9 @@ public class BookServiceImpl implements BookService {
         if (book == null) {
             throw new CustomException(HttpStatus.NOT_FOUND, "Invalid Book Id: " + id);
         }
-//                .orElseThrow(()-> new CustomException(HttpStatus.NOT_FOUND,"Invalid Book Id: "+id));
+
+        String photoString= imageDataService.imageToString(book.getPhoto().getPhoto());
+        book.setPhoto(ImageData.builder().photo(photoString).build());
         return BookMapper.mapToBookDto(book);
     }
 
@@ -98,7 +106,9 @@ public class BookServiceImpl implements BookService {
         } else {
             throw new CustomException(HttpStatus.BAD_REQUEST, "Published date cannot be in future!");
         }
-        book1.setPhoto(bookRequest.getPhoto());
+
+        ImageData savedImage=imageDataService.saveImage(bookRequest.getPhoto());
+        book1.setPhoto(savedImage);
         for (int authorId : bookRequest.getAuthorsId()) {
             Optional<Author> author = authorRepo.findById(authorId);
             if (author.isEmpty()){
