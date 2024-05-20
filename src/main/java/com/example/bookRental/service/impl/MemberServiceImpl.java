@@ -38,10 +38,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto addMember(MemberDto memberDto) {
         if (memberRepo.findByEmail(memberDto.getEmail()) != null) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "User with this email already exist!");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "UserMember with this email already exist!");
         }
         if (memberRepo.findByMobileNumber(memberDto.getMobileNumber()) != null) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "User with this number already exist!");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "UserMember with this number already exist!");
         }
 
         if (!memberDto.getMemberName().matches("^[a-zA-Z\s]+$")) {
