@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +38,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto addMember(MemberDto memberDto) {
         if (memberRepo.findByEmail(memberDto.getEmail()) != null) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "User with this email already exist!");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "UserMember with this email already exist!");
         }
         if (memberRepo.findByMobileNumber(memberDto.getMobileNumber()) != null) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "User with this number already exist!");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "UserMember with this number already exist!");
         }
 
         if (!memberDto.getMemberName().matches("^[a-zA-Z\s]+$")) {
@@ -60,8 +61,15 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     public void deleteMember(int id) {
-        Member member = memberRepo.findById(id).get();
-        member.setActive(false);
-        memberRepo.save(member);
+        Optional<Member> member = memberRepo.findById(id);
+        if (member.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid Member Id");
+        }
+        if (member.get().getActive()) {
+            member.get().setActive(false);
+        } else {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Member already deleted with id " + id);
+        }
+        memberRepo.save(member.get());
     }
 }

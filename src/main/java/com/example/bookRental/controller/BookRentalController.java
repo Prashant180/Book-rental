@@ -5,6 +5,7 @@ import com.example.bookRental.CustomResponse;
 import com.example.bookRental.dto.BookRentRequest;
 import com.example.bookRental.dto.BookRentalDto;
 import com.example.bookRental.model.BookRental;
+import com.example.bookRental.projection.BookRentalProjection;
 import com.example.bookRental.service.BookRentalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +25,19 @@ public class BookRentalController {
         return CustomResponse.success(service.getAllRentedBooks());
     }
 
-    @GetMapping("/{code}")
-    public CustomResponse<BookRentalDto> getRentedBookByCode(@PathVariable Integer code) {
+    @GetMapping("/all-with-name")
+    public CustomResponse<List<BookRentalProjection>> getAllRentedBookWithName(){
+        return CustomResponse.success(service.getAllRentedBooksWithName());
+    }
+
+    @GetMapping("/download")
+    public CustomResponse<BookRentalDto> downloadRentedData(){
+        service.downloadRentedData();
+        return CustomResponse.success();
+    }
+
+    @GetMapping("/by-code/{code}")
+    public CustomResponse<BookRentalProjection> getRentedBookByCode(@PathVariable Integer code) {
         return CustomResponse.success(service.getRentedBookByCode(code));
     }
 

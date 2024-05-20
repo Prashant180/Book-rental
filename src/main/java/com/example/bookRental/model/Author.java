@@ -16,7 +16,7 @@ import java.util.Set;
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String authorName;
     private String email;
     private String mobileNumber;
@@ -26,5 +26,12 @@ public class Author {
         this.authorName=authorName;
         this.mobileNumber=mobileNumber;
         this.email=email;
+    }
+
+    public Author(Integer id, String authorName, String email, String mobileNumber) {
+        this.id=id;
+        this.authorName=authorName;
+        this.email=email;
+        this.mobileNumber=mobileNumber;
     }
 }

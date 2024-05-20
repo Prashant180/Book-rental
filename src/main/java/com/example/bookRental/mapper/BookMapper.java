@@ -28,7 +28,7 @@ public class BookMapper {
                 book.getIsbn(),
                 book.getRating(),
                 book.getStock(),
-                book.getPhoto(),
+                book.getPhoto().getPhoto(),
                 book.getPublishedDate(),
                 book.getCategory().getId(),
                 authorIds

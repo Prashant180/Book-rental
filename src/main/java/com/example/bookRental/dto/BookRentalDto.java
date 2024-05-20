@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class BookRentalDto  {
    private Integer id;
    private Integer bookId;
-   private Integer transcationCode;
+   private Integer transactionCode;
    private LocalDate fromDate;
    private LocalDate toDate;
    private String status;

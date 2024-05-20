@@ -9,6 +9,8 @@ public interface AuthorService {
 
     AuthorDto addAuthor(AuthorDto authorDto);
 
+    AuthorDto updateAuthor(AuthorDto authorDto);
+
     List<AuthorDto> getAllAuthors();
 
     AuthorDto getAuthorById(int id);

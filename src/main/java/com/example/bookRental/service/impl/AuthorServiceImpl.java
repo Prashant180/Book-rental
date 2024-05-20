@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,10 +24,10 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public AuthorDto addAuthor(AuthorDto authorDto) {
         if (authorRepo.findByEmail(authorDto.getEmail()) != null) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "User with this email already exist!");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Author with this email already exist!");
         }
         if (authorRepo.findByMobileNumber(authorDto.getMobileNumber()) != null) {
-            throw new CustomException(HttpStatus.BAD_REQUEST, "User with this number already exist!");
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Author with this number already exist!");
         }
         if (!authorDto.getAuthorName().matches("^[a-zA-Z\s]+$")) {
             throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "Invalid name format!");
@@ -39,6 +41,32 @@ public class AuthorServiceImpl implements AuthorService {
         Author author = AuthorMapper.mapToAuthor(authorDto);
         Author savedAuthor = authorRepo.save(author);
         return AuthorMapper.mapToAuthorDto(savedAuthor);
+    }
+
+    public AuthorDto updateAuthor(AuthorDto authorDto) {
+        Optional<Author> author = authorRepo.findById(authorDto.getId());
+        if (author.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Author not found to update!");
+        }
+        if (!Objects.equals(author.get().getEmail(), authorDto.getEmail())) {
+            if (authorRepo.findByEmail(authorDto.getEmail()) != null) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, "Author with this email already exist!");
+            }
+        }
+        if (!Objects.equals(author.get().getMobileNumber(), authorDto.getMobileNumber())) {
+            if (authorRepo.findByMobileNumber(authorDto.getMobileNumber()) != null) {
+                throw new CustomException(HttpStatus.BAD_REQUEST, "Author with this number already exist!");
+            }
+        }
+
+        if (!authorDto.getEmail().matches("^[a-zA-Z0-9_]+@[a-z]+\\.[a-z]{2,6}$")) {
+            throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "Invalid email format!");
+        }
+        if (!authorDto.getMobileNumber().matches("^[0-9]{10}$")) {
+            throw new CustomException(HttpStatus.NOT_ACCEPTABLE, "Invalid phone number!");
+        }
+        Author authorToSave = AuthorMapper.mapToAuthor(authorDto);
+        return AuthorMapper.mapToAuthorDto(authorRepo.save(authorToSave));
     }
 
     @Override
@@ -58,8 +86,15 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void deleteAuthor(int id) {
-        Author author = authorRepo.findById(id).get();
-        author.setActive(false);
-        authorRepo.save(author);
+        Optional<Author> author = authorRepo.findById(id);
+        if (author.isEmpty()) {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Invalid Author Id");
+        }
+        if (author.get().getActive()) {
+            author.get().setActive(false);
+        } else {
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Author already deleted with id " + id);
+        }
+        authorRepo.save(author.get());
     }
 }

@@ -27,14 +27,14 @@ public class MemberController {
         return CustomResponse.success(service.addMember(memberDto));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/get-by-id/{id}")
     public CustomResponse<MemberDto> getMember(@PathVariable Integer id){
         return CustomResponse.success(service.getMemberById(id));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public CustomResponse<MemberDto> deleteMember(@PathVariable Integer id){
         service.deleteMember(id);
-        return CustomResponse.success();
+        return CustomResponse.success("Member deleted with Id "+id);
     }
 }

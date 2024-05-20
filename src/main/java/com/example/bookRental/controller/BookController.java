@@ -30,14 +30,19 @@ public class BookController {
         return CustomResponse.success(service.addBook(bookRequest));
     }
 
-    @GetMapping("/{id}")
+    @PutMapping("/update")
+    public CustomResponse<BookDto> updateBook(@RequestBody BookDto bookDto){
+        return CustomResponse.success(service.updateBook(bookDto));
+    }
+
+    @GetMapping("/get-by-id/{id}")
     public CustomResponse<BookDto> getBook(@PathVariable Integer id) {
         return CustomResponse.success(service.getBookById(id));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public CustomResponse<BookDto> deleteBook(@PathVariable Integer id) {
         service.deleteBook(id);
-        return CustomResponse.success();
+        return CustomResponse.success("Book deleted with Id "+id);
     }
 }

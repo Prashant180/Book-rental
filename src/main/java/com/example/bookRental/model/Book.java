@@ -23,7 +23,9 @@ public class Book {
     private Integer isbn;
     private Integer rating;
     private Integer stock;
-    private String photo;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    private ImageData photo;
     private LocalDate publishedDate;
     private Boolean active=true;
 
