@@ -40,8 +40,9 @@ public class ImageService implements ImageDataService {
         String imagePath= null;
         imagePath=imageDataRepo.findById(id).get().getPhoto();
 
-        return imageToString(imagePath);
+        return imagePath;
     }
+
 
     public String imageToString(String imagePath){
         String encodedString;

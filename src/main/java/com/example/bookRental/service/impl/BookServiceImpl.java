@@ -50,8 +50,8 @@ public class BookServiceImpl implements BookService {
             throw new CustomException(HttpStatus.NOT_FOUND, "Invalid Book Id: " + id);
         }
 
-        String photoString= imageDataService.imageToString(book.getPhoto().getPhoto());
-        book.setPhoto(ImageData.builder().photo(photoString).build());
+//        String photoString= imageDataService.imageToString(book.getPhoto().getPhoto());
+//        book.setPhoto(ImageData.builder().photo(photoString).build());
         return BookMapper.mapToBookDto(book);
     }
 
