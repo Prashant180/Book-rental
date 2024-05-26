@@ -278,9 +278,28 @@ public class BookRentalServiceImpl implements BookRentalService {
     public void sendEmail() throws MessagingException {
         List<BookRentalProjectionWithEmail> bookRentalDueDate=bookRentalRepo.findBookRentalDueDate();
 
+
+
         for (BookRentalProjectionWithEmail b:bookRentalDueDate){
-            String message="Your due date for book "+b.getBook_Name()+" is exceeded on "+b.getTo_Date()+" so kindly return the book and avoid penalties";
-            emailService.sendEmail("iamprashant1010@gmail.com", "Due date exceeded", message);
+//            String message="Your due date for book "+b.getBook_Name()+" is exceeded on "+b.getTo_Date()+" so kindly return the book and avoid penalties";
+            String message="<!DOCTYPE html>\n" +
+                    "<html>\n" +
+                    "<head>\n" +
+                    "    <title>Email Template</title>\n" +
+                    "</head>\n" +
+                    "<body>\n" +
+                    "    <h1>Book Rental</h1>\n" +
+                    "    <p>Book return delayed of book $bookName$.</p>\n" +
+                    "    <p>Last date to return: $returnDate$</p>" +
+                    "    <p>Please return the book as soon as possible and avoid penalties.</p>" +
+                    "    <p>Contact: book_rental@gmail.com</p>" +
+                    "</body>\n" +
+                    "</html>";
+
+            message=message.replace("$bookName$", b.getBook_Name());
+            message=message.replace("$returnDate$", b.getTo_Date().toString());
+
+            emailService.sendEmail(b.getEmail(), "Due date exceeded", message);
         }
     }
 }

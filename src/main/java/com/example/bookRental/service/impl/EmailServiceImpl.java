@@ -24,15 +24,15 @@ public class EmailServiceImpl {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        Context context = new Context();
-        context.setVariable("subject", subject);
-        context.setVariable("message", text);
-
-        String html = templateEngine.process("emailTemplate", context);
+//        Context context = new Context();
+//        context.setVariable("subject", subject);
+//        context.setVariable("message", text);
+//
+//        String html = templateEngine.process("emailTemplate", context);
 
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(html, true);
+        helper.setText(text, true);
 
         javaMailSender.send(message);
 
