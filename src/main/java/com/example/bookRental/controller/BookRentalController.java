@@ -10,6 +10,8 @@ import com.example.bookRental.service.BookRentalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,9 +33,9 @@ public class BookRentalController {
     }
 
     @GetMapping("/download")
-    public CustomResponse<BookRentalDto> downloadRentedData(){
-        service.downloadRentedData();
-        return CustomResponse.success();
+    public CustomResponse<BookRentalDto> downloadRentedData(@RequestParam LocalDate from, @RequestParam LocalDate to){
+        service.downloadRentedData(from, to);
+        return CustomResponse.success("Data downloaded in excel");
     }
 
     @GetMapping("/by-code/{code}")

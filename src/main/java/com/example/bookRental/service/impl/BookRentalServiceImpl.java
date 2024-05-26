@@ -11,7 +11,9 @@ import com.example.bookRental.model.Book;
 import com.example.bookRental.model.BookRental;
 import com.example.bookRental.model.Member;
 import com.example.bookRental.projection.BookRentalProjection;
+import com.example.bookRental.projection.BookRentalProjectionWithEmail;
 import com.example.bookRental.service.BookRentalService;
+import jakarta.mail.MessagingException;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -20,16 +22,14 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +43,9 @@ public class BookRentalServiceImpl implements BookRentalService {
 
     @Autowired
     private MemberRepo memberRepo;
+
+    @Autowired
+    private EmailServiceImpl emailService;
 
     @Override
     public List<BookRentalDto> getAllRentedBooks() {
@@ -136,8 +139,12 @@ public class BookRentalServiceImpl implements BookRentalService {
         return BookRentalMapper.mapToBookRentalDto(savedRentBook);
     }
 
-    public void downloadRentedData(){
-        List<BookRental> bookRentals = bookRentalRepo.findAll();
+    public void downloadRentedData(LocalDate from,LocalDate to){
+        if(to == null){
+            LocalDate currentDate=LocalDate.now();
+            to=currentDate;
+        }
+        List<BookRentalProjection> bookRentals = bookRentalRepo.findBookRentalBetweenDate(from,to);
 
         XSSFWorkbook workbook=new XSSFWorkbook();
 
@@ -150,6 +157,7 @@ public class BookRentalServiceImpl implements BookRentalService {
         XSSFSheet spreadsheet1=workbook.createSheet("Book rental data");
 
         XSSFRow row=spreadsheet1.createRow(0);
+        spreadsheet1.setDefaultColumnWidth(20);
         XSSFCell cell;
 
         cell=row.createCell(0);
@@ -180,34 +188,14 @@ public class BookRentalServiceImpl implements BookRentalService {
         cell.setCellStyle(style);
         cell.setCellValue("Transaction Code");
 
-        int i=1;
+        cell=row.createCell(7);
+        cell.setCellStyle(style);
+        cell.setCellValue("Book Name");
 
-        for (BookRental bookRental: bookRentals){
-            row=spreadsheet1.createRow(i);
+        cell=row.createCell(8);
+        cell.setCellStyle(style);
+        cell.setCellValue("Member Name");
 
-            cell=row.createCell(0);
-            cell.setCellValue(bookRental.getId());
-
-            cell=row.createCell(1);
-            cell.setCellValue(bookRental.getBook().getId());
-
-            cell=row.createCell(2);
-            cell.setCellValue(bookRental.getMember().getId());
-
-            cell=row.createCell(3);
-            cell.setCellValue(bookRental.getFromDate().toString());
-
-            cell=row.createCell(4);
-            cell.setCellValue(bookRental.getToDate().toString());
-
-            cell=row.createCell(5);
-            cell.setCellValue(bookRental.getStatus());
-
-            cell=row.createCell(6);
-            cell.setCellValue(bookRental.getTransactionCode());
-
-            i++;
-        }
         spreadsheet1.autoSizeColumn(0);
         spreadsheet1.autoSizeColumn(1);
         spreadsheet1.autoSizeColumn(2);
@@ -215,6 +203,53 @@ public class BookRentalServiceImpl implements BookRentalService {
         spreadsheet1.autoSizeColumn(4);
         spreadsheet1.autoSizeColumn(5);
         spreadsheet1.autoSizeColumn(6);
+        spreadsheet1.autoSizeColumn(7);
+        spreadsheet1.autoSizeColumn(8);
+
+        int i=1;
+
+        for (BookRentalProjection bookRental: bookRentals){
+            row=spreadsheet1.createRow(i);
+
+            cell=row.createCell(0);
+            cell.setCellValue(bookRental.getId());
+
+            cell=row.createCell(1);
+            cell.setCellValue(bookRental.getBook_Id());
+
+            cell=row.createCell(2);
+            cell.setCellValue(bookRental.getMember_Id());
+
+            cell=row.createCell(3);
+            cell.setCellValue(bookRental.getFrom_Date().toString());
+
+            cell=row.createCell(4);
+            cell.setCellValue(bookRental.getTo_Date().toString());
+
+            cell=row.createCell(5);
+            cell.setCellValue(bookRental.getStatus());
+
+            cell=row.createCell(6);
+            cell.setCellValue(bookRental.getTransaction_Code());
+
+            cell=row.createCell(7);
+            cell.setCellValue(bookRental.getBook_Name());
+
+            cell=row.createCell(8);
+            cell.setCellValue(bookRental.getMember_Name());
+
+            spreadsheet1.autoSizeColumn(0);
+            spreadsheet1.autoSizeColumn(1);
+            spreadsheet1.autoSizeColumn(2);
+            spreadsheet1.autoSizeColumn(3);
+            spreadsheet1.autoSizeColumn(4);
+            spreadsheet1.autoSizeColumn(5);
+            spreadsheet1.autoSizeColumn(6);
+            spreadsheet1.autoSizeColumn(7);
+            spreadsheet1.autoSizeColumn(8);
+
+            i++;
+        }
 
         try (FileOutputStream output= new FileOutputStream(new File("d:/rentedData.xlsx"))){
             workbook.write(output);
@@ -236,6 +271,16 @@ public class BookRentalServiceImpl implements BookRentalService {
             bookRental.setStatus("closed");
             bookRentalRepo.save(bookRental);
             System.out.println("Book returned");
+        }
+    }
+
+    @Scheduled(cron = "0 25 0 1/1 * ? ")
+    public void sendEmail() throws MessagingException {
+        List<BookRentalProjectionWithEmail> bookRentalDueDate=bookRentalRepo.findBookRentalDueDate();
+
+        for (BookRentalProjectionWithEmail b:bookRentalDueDate){
+            String message="Your due date for book "+b.getBook_Name()+" is exceeded on "+b.getTo_Date()+" so kindly return the book and avoid penalties";
+            emailService.sendEmail("iamprashant1010@gmail.com", "Due date exceeded", message);
         }
     }
 }

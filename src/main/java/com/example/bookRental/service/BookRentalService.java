@@ -5,6 +5,8 @@ import com.example.bookRental.dto.BookRentalDto;
 import com.example.bookRental.model.BookRental;
 import com.example.bookRental.projection.BookRentalProjection;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 public interface BookRentalService {
@@ -21,7 +23,7 @@ public interface BookRentalService {
 
     BookRentalDto rentBook(BookRentRequest bookRentRequest);
 
-    void downloadRentedData();
+    void downloadRentedData(LocalDate from, LocalDate to);
 
     void returnBook(int code);
 
