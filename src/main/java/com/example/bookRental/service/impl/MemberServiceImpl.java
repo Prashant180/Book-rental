@@ -6,6 +6,7 @@ import com.example.bookRental.dto.MemberDto;
 import com.example.bookRental.mapper.MemberMapper;
 import com.example.bookRental.model.Member;
 import com.example.bookRental.service.MemberService;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     private MemberRepo memberRepo;
+
+    @Autowired
+    private EmailServiceImpl emailService;
 
     @Override
     public List<MemberDto> getAllMember() {
